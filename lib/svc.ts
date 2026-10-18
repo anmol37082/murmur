@@ -1,5 +1,5 @@
 import { Message } from "../models";
-export const uDto = (u: any) => ({ id: String(u._id), name: u.name, email: u.email, avatar: u.avatar || "", lastSeenAt: u.lastSeenAt });
+export const uDto = (u: any) => ({ id: String(u._id), name: u.name, username: u.username || "", email: u.email, avatar: u.avatar || "", lastSeenAt: u.lastSeenAt });
 export const mDto = (m: any) => ({
   id: String(m._id), conversationId: String(m.conversationId), senderId: String(m.senderId), clientId: m.clientId,
   text: m.deletedAt ? "" : m.text, deleted: !!m.deletedAt, editedAt: m.editedAt, createdAt: m.createdAt,

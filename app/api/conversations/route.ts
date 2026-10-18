@@ -6,8 +6,8 @@ const unread = (c: any, me: string) => Message.countDocuments({ conversationId: 
 export async function GET() {
   const me = await userId(); if (!me) return bad("Unauthorized", 401);
   await db();
-  const cs = await Conversation.find({ participants: me }).sort({ updatedAt: -1 }).populate("participants", "name email avatar lastSeenAt").lean();
-  return NextResponse.json({ conversations: await Promise.all(cs.map(async (c) => convDto(c, me, await unread(c, me)))) });
+  const cs = await Conversation.find({ participants: me }).sort({ updatedAt: -1 }).populate("participants", "name username email avatar lastSeenAt").lean();
+  return NextResponse.json({ conversations: await Promise.all(cs.map(async (c) => convDto(c, me, await unread(c, me)))) }, { headers: { "Cache-Control": "no-store, private" } });
 }
 export async function POST(req: NextRequest) {
   if (!csrfOk(req)) return bad("Forbidden", 403);
@@ -20,6 +20,6 @@ export async function POST(req: NextRequest) {
   let c: any;
   try { c = await Conversation.findOneAndUpdate({ pairKey }, { $setOnInsert: { pairKey, participants: [me, other] } }, { upsert: true, new: true }); }
   catch (e: any) { if (e.code !== 11000) throw e; c = await Conversation.findOne({ pairKey }); }
-  c = await Conversation.findById(c._id).populate("participants", "name email avatar lastSeenAt").lean();
+  c = await Conversation.findById(c._id).populate("participants", "name username email avatar lastSeenAt").lean();
   return NextResponse.json({ conversation: convDto(c, me, await unread(c, me)) });
 }

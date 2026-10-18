@@ -10,7 +10,7 @@ button,input,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;
 input,textarea{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
 .primary{background:var(--brand);color:#fff;padding:10px 18px;border-radius:12px;font-weight:600;transition:transform .1s}.primary:active{transform:scale(.97)}.primary:disabled{opacity:.5}
 .round{width:42px;height:42px;padding:0;border-radius:50%}.link{color:var(--brand);font-size:.85rem;padding:4px}.center{align-self:center}.ghost{padding:6px;border-radius:10px}
-.app{display:grid;grid-template-columns:minmax(300px,360px) 1fr;height:100dvh}
+.app{display:grid;grid-template-columns:minmax(300px,360px) 1fr;height:var(--app-height,100dvh);overflow:hidden}
 .side{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
 .main{display:flex;flex-direction:column;min-height:0;min-width:0}
 .bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
@@ -30,12 +30,13 @@ input,textarea{background:var(--bg);border:1px solid var(--line);border-radius:1
 .mine .bubble{background:var(--me);color:#fff;border-radius:var(--r) var(--r) 4px var(--r)}.mine small{color:#ffffffb0}
 .bubble small{display:block;text-align:right;margin-top:2px}.read{color:#7ce3ff}.del{font-style:italic;opacity:.6}
 .quote{border-left:3px solid var(--accent);padding:2px 8px;margin-bottom:4px;font-size:.82rem;opacity:.85;background:#0000000d;border-radius:6px}
-.acts{position:absolute;top:-14px;right:8px;display:none;background:var(--panel);border-radius:10px;box-shadow:0 2px 8px #0003}.bubble:hover .acts,.bubble:focus-within .acts{display:flex}.acts button{padding:3px 6px;color:var(--ink)}
-.composer{display:flex;gap:8px;align-items:flex-end;padding:10px 14px;background:var(--panel);border-top:1px solid var(--line)}.composer textarea{resize:none;max-height:120px}
+.acts{position:absolute;top:-14px;right:8px;display:none;background:var(--panel);border-radius:10px;box-shadow:0 2px 8px #0003;z-index:2}.acts button{padding:3px 6px;color:var(--ink)}.act-toggle{display:none}
+.composer{display:flex;gap:8px;align-items:flex-end;padding:10px 14px;background:var(--panel);border-top:1px solid var(--line)}.composer textarea{flex:1;min-width:0;resize:none;max-height:120px}.composer .round{flex:0 0 42px;width:42px;min-width:42px;height:42px;display:grid;place-items:center}.composer .round svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ctx{display:flex;justify-content:space-between;padding:6px 14px;background:var(--panel);border-top:1px solid var(--line);font-size:.82rem;color:var(--mute)}.emojis{display:flex;padding:4px 14px;background:var(--panel)}
 .banner{background:var(--accent);color:#fff;text-align:center;padding:4px;font-size:.8rem}
 .typing i{display:inline-block;width:4px;height:4px;margin-left:2px;border-radius:50%;background:currentColor;animation:b 1s infinite}.typing i:nth-child(3){animation-delay:.15s}.typing i:nth-child(4){animation-delay:.3s}@keyframes b{50%{transform:translateY(-3px)}}@keyframes pop{from{opacity:0;transform:translateY(4px)}}
 .modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:16px;z-index:10}.actions{display:flex;justify-content:space-between;align-items:center}.pic input{display:none}.pic{cursor:pointer;align-items:center}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;z-index:20}
 .back{display:none}
-@media(max-width:760px){.app{grid-template-columns:1fr}.main{display:none}.chat-open .side{display:none}.chat-open .main{display:flex}.back{display:block}.bubble{max-width:85%}.acts{display:flex;top:auto;bottom:-14px}}
+@media(min-width:761px){.bubble:hover .acts,.bubble:focus-within .acts{display:flex}}
+@media(max-width:760px){.app{grid-template-columns:1fr}.main{display:none}.chat-open .side{display:none}.chat-open .main{display:flex}.back{display:block}.bubble{max-width:85%}.act-toggle{display:block;position:absolute;top:2px;right:4px;width:28px;height:28px;border-radius:50%;background:var(--panel);color:var(--ink);box-shadow:0 1px 5px #0002;line-height:1}.acts{top:32px;right:4px;flex-direction:column}.acts.open{display:flex}.bubble:hover .acts:not(.open),.bubble:focus-within .acts:not(.open){display:none}}

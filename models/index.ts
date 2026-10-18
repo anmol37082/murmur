@@ -1,13 +1,22 @@
 import { Schema, model, models, Model } from "mongoose";
-const get = (n: string, s: Schema): Model<any> => (models[n] as Model<any>) || model<any>(n, s);
+const get = (n: string, s: Schema): Model<any> => {
+  const existing = models[n] as Model<any> | undefined;
+  if (existing) {
+    // Next.js dev hot reload can keep a compiled model with an older schema.
+    existing.schema.add(s.obj);
+    return existing;
+  }
+  return model<any>(n, s);
+};
 const Id = Schema.Types.ObjectId;
 export const User = get("User", new Schema({
   name: { type: String, required: true, trim: true, maxlength: 60 },
+  username: { type: String, lowercase: true, trim: true, minlength: 3, maxlength: 20 },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   passwordHash: { type: String, required: true },
   avatar: { type: String, default: "" },
   lastSeenAt: { type: Date, default: Date.now },
-}, { timestamps: true }).index({ name: 1 }));
+}, { timestamps: true }).index({ name: 1 }).index({ username: 1 }, { unique: true, partialFilterExpression: { username: { $type: "string" } } }));
 export const Conversation = get("Conversation", new Schema({
   participants: [{ type: Id, ref: "User" }],
   pairKey: { type: String, required: true, unique: true }, // sorted "idA:idB" => no duplicate DMs

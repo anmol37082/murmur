@@ -8,5 +8,5 @@ export async function GET(req: NextRequest) {
   if (!Types.ObjectId.isValid(cid) || !(await Conversation.exists({ _id: cid, participants: me }))) return bad("Forbidden", 403);
   const f: any = { conversationId: cid }; if (Types.ObjectId.isValid(before)) f._id = { $lt: before };
   const l = await Message.find(f).sort({ _id: -1 }).limit(30).populate("replyTo", "text senderId deletedAt").lean();
-  return NextResponse.json({ messages: l.reverse().map(mDto) });
+  return NextResponse.json({ messages: l.reverse().map(mDto) }, { headers: { "Cache-Control": "no-store, private" } });
 }

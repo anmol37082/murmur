@@ -42,8 +42,8 @@ io.on("connection", async (s) => {
   s.on("message:send", async (d: any, ack: (r: unknown) => void = () => {}) => {
     try {
       if (limited("msg:" + uid, 30, 10000)) return ack({ error: "Slow down" });
-      const text = String(d?.text || "").trim(), clientId = String(d?.clientId || "");
-      if (!text || text.length > 4000 || !/^[\w-]{8,64}$/.test(clientId)) return ack({ error: "Invalid message" });
+      const text = typeof d?.text === "string" ? d.text.trim() : "", clientId = typeof d?.clientId === "string" ? d.clientId : "";
+      if (!text || text.length > 4000 || !/^[\w-]{8,64}$/.test(clientId) || typeof d?.conversationId !== "string") return ack({ error: "Invalid message" });
       const c = await member(d?.conversationId, uid); if (!c) return ack({ error: "Forbidden" });
       let m: any = await Message.findOne({ senderId: uid, clientId }), fresh = false;
       if (!m) {
@@ -62,6 +62,7 @@ io.on("connection", async (s) => {
   });
 
   s.on("message:read", async (d: any) => {
+    if (limited("read:" + uid, 60, 10000)) return;
     const c = await member(d?.conversationId, uid); if (!c) return;
     await Message.updateMany({ conversationId: c._id, senderId: { $ne: uid }, readBy: { $ne: uid } }, { $addToSet: { readBy: uid, deliveredTo: uid } });
     emitTo(c.participants.map(String), "message:read", { conversationId: String(c._id), userId: uid });
@@ -74,9 +75,10 @@ io.on("connection", async (s) => {
   });
 
   const change = (kind: "edit" | "delete") => async (d: any, ack: (r: unknown) => void = () => {}) => {
+    if (limited("change:" + uid, 30, 10000)) return ack({ error: "Slow down" });
     const m: any = Types.ObjectId.isValid(String(d?.id)) ? await Message.findOne({ _id: d.id, senderId: uid, deletedAt: { $exists: false } }) : null;
     if (!m) return ack({ error: "Not allowed" });
-    if (kind === "edit") { const t = String(d.text || "").trim(); if (!t || t.length > 4000) return ack({ error: "Invalid text" }); m.text = t; m.editedAt = new Date(); }
+    if (kind === "edit") { const t = typeof d?.text === "string" ? d.text.trim() : ""; if (!t || t.length > 4000) return ack({ error: "Invalid text" }); m.text = t; m.editedAt = new Date(); }
     else m.deletedAt = new Date();
     await m.save();
     const c: any = await Conversation.findById(m.conversationId);
